@@ -29,23 +29,22 @@ while(condition)
             r = r + c(j,i);
             d = d + c(i,j);
         end
-        vi = a(1,i) + r + d;
-        v = [v, vi];
-        activation = min(lambda(i)/vi, 1);
-        insolvency = max(0, (lambda(i) - vi)/d);
+        v = [v, a(i) + r + d];
+        activation = min(lambda(i)/v(i), 1);
+        insolvency = max(0, (lambda(i) - v(i))/d);
         B = [B, activation];
         b = [b, insolvency];
     end
     
     if(length(omega) >= 2)
-        %b = searchCyclesAndSetValues(b, c);
+        b = searchCyclesAndSetValues(b, c);
     end
     
     Bv = 0;
     for i = 1:omega
         Bv = Bv + B(i) * v(i);
     end
-    if( t > 2)%Bv >= extShock)
+    if( Bv >= extShock)
         condition = false;
     end
     fprintf('Iteration %d:\n', t);
