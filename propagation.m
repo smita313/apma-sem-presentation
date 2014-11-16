@@ -1,4 +1,4 @@
-function [B, b] = propagation(bk, ak, aik, a, c, omega, graph)
+function [B, b] = propagation(bk, ak, aik, a, c, omega)
 extShock = 0; % calculate external shock
 
 for i = 1:length(c)
@@ -10,7 +10,7 @@ for i = 1:length(c)
 end
 
 for i = 1:length(ak)
-    extShock = extShock + bk(1,i) * ak(1,i);
+    extShock = extShock + bk(i) * ak(i);
 end
 
 t = 1;
@@ -31,19 +31,19 @@ while(condition)
         end
         vi = a(1,i) + r + d;
         v = [v, vi];
-        activation = min(lambda(1,i)/vi, 1);
-        insolvency = max(0, (lambda(1,i) - vi)/d);
+        activation = min(lambda(i)/vi, 1);
+        insolvency = max(0, (lambda(i) - vi)/d);
         B = [B, activation];
         b = [b, insolvency];
     end
     
     if(length(omega) >= 2)
-        b = searchCyclesAndSetValues(b, graph, c);
+        %b = searchCyclesAndSetValues(b, c);
     end
     
     Bv = 0;
-    for i = 1:length(omega)
-        Bv = Bv + B(1, i) * v(1, i);
+    for i = 1:omega
+        Bv = Bv + B(i) * v(i);
     end
     if( t > 2)%Bv >= extShock)
         condition = false;
