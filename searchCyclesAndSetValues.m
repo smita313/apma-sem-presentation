@@ -27,21 +27,22 @@ end
 
 [~, cycles] = find_elem_circuits(graph);
 dontChangeValue = [];
+visited = false(length(graph));
 for cycle = cycles
-    for connection  = connections
-        conn = cell2mat(connection);
-        for c = conn
-            cyc = cell2mat(cycle);
-            if(ismember(c, cyc) == 0)
-                dontChangeValue = [dontChangeValue, conn];
+    cyc = cell2mat(cycle);
+    for node = cyc
+        visited(node) = true;
+        connection = connections{node};
+        for c = connection
+            if(~ismember(c, cyc))
+                dontChangeValue = [dontChangeValue, node];
             end
-        end
-        
+        end        
     end
 end
 
 for i = 1:length(b)
-    if(ismember(i, dontChangeValue) == 0)
+    if(~ismember(i, dontChangeValue) && visited(i))
         b(i) = 1;
     end
 end
