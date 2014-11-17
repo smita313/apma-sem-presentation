@@ -1,18 +1,4 @@
-function [b] = searchCyclesAndSetValues(b, c)
-S = [];
-E = [];
-for i = 1:length(c)
-    for j = 1:length(c)
-        if(c(i,j) > 0)
-            S = [S, i];
-            E = [E, j];
-        end
-    end
-end
-
-graph = sparse(S, E, true, length(c), length(c));
-view(biograph(graph));
-
+function [b] = searchCyclesAndSetValues(b, graph)
 connections = {};
 for i = 1:length(graph)
     distances = bfs(graph,i);
@@ -27,7 +13,7 @@ end
 
 [~, cycles] = find_elem_circuits(graph);
 dontChangeValue = [];
-visited = false(length(graph));
+visited = false(1,length(graph));
 for cycle = cycles
     cyc = cell2mat(cycle);
     for node = cyc

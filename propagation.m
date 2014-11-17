@@ -1,4 +1,19 @@
 function [B, b] = propagation(bk, ak, aik, a, c, omega)
+
+S = [];
+E = [];
+for i = 1:length(c)
+    for j = 1:length(c)
+        if(c(i,j) > 0)
+            S = [S, i];
+            E = [E, j];
+        end
+    end
+end
+
+graph = sparse(S, E, true, length(c), length(c));
+view(biograph(graph));
+
 for i = 1:length(c)
     for j = 1:length(c)
         if (i==j)
@@ -28,7 +43,7 @@ while(condition)
             r = r + c(j,i);
             d = d + c(i,j);
         end
-        v = [v, a(i) + r + d];
+        v = [v, a(i) + r - d];
         activation = min(lambda(i)/v(i), 1);
         insolvency = max(0, (lambda(i) - v(i))/d);
         B = [B, activation];
@@ -36,20 +51,23 @@ while(condition)
     end
     
     if(omega >= 2) % Step 3: Find all cycles and set bi = 1 if nodes in cycle       
-        b = searchCyclesAndSetValues(b, c); % have no debt with nodes outside cycle
+        b = searchCyclesAndSetValues(b, graph); % have no debt with nodes outside cycle
     end
     
-    Bv = 0;
+    flowToSink = 0;
     for i = 1:omega
-        Bv = Bv + B(i) * v(i);
+        flowToSink = flowToSink + B(i) * v(i);
     end
-    if( Bv >= extShock) % Step 4: Check equality
+    if (flowToSink >= extShock || t > 20) % Step 4: Check equality
         condition = false;
     end
+    
     fprintf('Iteration %d:\n', t);
     fprintf('[B]:' );
     disp(B);
     fprintf('[b]:' );
     disp(b);
+    fprintf('flowToSink: %d\n', flowToSink);
+    fprintf('externalShock: %d\n\n', extShock);
     t = t + 1;
 end
